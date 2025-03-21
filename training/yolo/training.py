@@ -1,17 +1,19 @@
 from ultralytics import YOLO, checks
 from yolo.utils import getModel
 import os
+import torch
 
 checks()
 
 async def yoloTraining (model: None | int = None, size: int | list[int] = 1280, args: list[str] = []):
+  device = 'cuda' if torch.cuda.is_available() else 'cpu'
   # Load the YOLOv8 model
   if model is not None:
     modelPath = getModel(model_num=model, find='weights/best.pt')
     print(f'⚠️ Treinando modelo com base no modelo {model}, que setá em {modelPath}')
-    model = YOLO(f'{modelPath}/weights/best.pt', task='segment')
+    model = YOLO(f'{modelPath}/weights/best.pt', task='segment').to(device)
   else:
-    model = YOLO("yolov8s-seg", task='segment')
+    model = YOLO("../yolo12-seg.yaml", task='segment').load("yolo12s.pt").to(device)
 
   # https://docs.ultralytics.com/pt/usage/cfg/#train-settings
   # https://medium.com/@nainaakash012/when-does-label-smoothing-help-89654ec75326
@@ -21,7 +23,7 @@ async def yoloTraining (model: None | int = None, size: int | list[int] = 1280, 
     cfg=os.path.abspath("yolo/best_hyperparameters.yaml"),
     patience=25,
     epochs=1000,
-    batch=2,
+    batch=1,
     imgsz=size,
     # rect=True, # Modo Retangular
     # resume=True
