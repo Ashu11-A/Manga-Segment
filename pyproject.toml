@@ -1,0 +1,45 @@
+[project]
+name = "manga-segment"
+version = "0.2.0"
+description = "Unified computer-vision framework for manga segmentation (training, inference, serving)."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.10.8",
+    "opencv-python>=4.13.0.92",
+    "pillow>=10.4.0",
+    "ruff>=0.15.9",
+    "tensorflow>=2.17",
+    "torch>=2.11.0",
+    "torchvision>=0.26.0",
+    "tqdm>=4.66.4",
+    "ultralytics>=8.4.33",
+    # Serving proxy
+    "flask>=3.0.3",
+    "requests>=2.32.3",
+    # Dataset download & interactive CLI
+    "roboflow>=1.1",
+    "python-dotenv>=1.0",
+    "questionary>=2.0",
+]
+
+[project.optional-dependencies]
+# U-Net training/conversion only. Kept optional because tensorflowjs pulls in a
+# heavy jax stack that is irrelevant to inference and serving. Install with:
+#   uv sync --extra unet-training
+unet-training = [
+    "keras-tuner>=1.4",
+    "tensorflowjs>=4.0",
+]
+# NOTE: PaddleOCR-based dataset distillation is intentionally NOT a dependency
+# of this project. PaddlePaddle pins protobuf <=3.20.2, which is incompatible
+# with this project's tensorflow (needs protobuf >=3.20.3), so the two cannot
+# share an environment. The distill tool therefore runs in its own isolated
+# environment via the self-contained script `src/dataset/run.py`
+# (PEP 723 inline metadata):  uv run src/dataset/run.py --help
+
+[tool.ruff]
+ignore = ["W191", "E111", "E114", "E117"]
+
+[tool.ruff.format]
+indent-style = "tab"

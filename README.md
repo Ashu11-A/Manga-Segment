@@ -104,83 +104,55 @@ If you use this dataset in a research paper, please cite it using the following 
 | ------- | --------  |
 | [Python](https://www.python.org)  | [v3.10.12](https://www.python.org/downloads/release/python-31012/) |
 
-## 💹 | [Production](https://github.com/Ashu11-A/Manga-Segment/tree/main/src) (proxy only)
+## 📦 | [Unified package](https://github.com/Ashu11-A/Manga-Segment/tree/main/src)
 
-```sh
-# Install requirements
-cd src
-python3.10 -m venv ./python
-source python/bin/activate
-
-pip install -r requirements.txt
-
-source python/bin/activate
-
-# Start
-python app.py
-```
-
-## 🐛 | [Develop](https://github.com/Ashu11-A/Manga-Segment/tree/main/training) (training)
-
-### Install requirements
+Training, inference and the production proxy now live in a single
+[uv](https://docs.astral.sh/uv/)-managed folder (`src/`) built on a scalable,
+plug-in framework. See [`src/README.md`](./src/README.md) for full details.
 
 ```sh
 # Windows WSL2: https://www.tensorflow.org/install/pip?hl=en#windows-wsl2_1
 # Install CUDA: https://developer.nvidia.com/cuda-downloads
-
 sudo apt install nvidia-cuda-toolkit
-sudo apt install -y python3.10-venv libjpeg-dev zlib1g-dev
+sudo apt install -y libjpeg-dev zlib1g-dev
+
+cd src
+uv sync                       # inference + serving + training
+uv sync --extra unet-training # add tensorflowjs + keras-tuner (U-Net train/convert)
 ```
 
-### Training
+### Unified CLI
+
+Run `main.py` with **no arguments** for an interactive arrow-key wizard that
+lets you pick a command and its options, prints the resulting command, and then
+runs it (training starts right away for `train`):
 
 ```sh
-cd training
-python3.10 -m venv ./python
-source python/bin/activate
-
-pip install -r requirements.txt
-pip install --upgrade pip setuptools wheel
-pip install pillow --no-binary :all:
-
-source python/bin/activate
+uv run python main.py        # interactive: ↑/↓ select → toggle options → run
 ```
 
-Yolo
-```sh
-# Train normally
-python training/start.py --yolo --size 1400
-
-# Look for the best result
-python training/start.py --yolo --size 1400 --best
-
-# Train on another model
-python training/start.py --yolo --size 1400 --model 10
-
-# Convert model in TensorFlow
-python training/start.py --yolo --size 1400 --model 10 --convert # or only --convert without --model for latest model
-
-# Test Model
-python training/start.py --yolo --size 1400 --model 10 --test # or only --test without --model for latest model
-```
-
-Unet (legacy)
-```sh
-# Look for the best result
-python training/start.py --unet --best
-
-# Run a ready-made script
-python training/start.py --unet
-
-# Convert model in TensorFlow
-python training/start.py --unet --model 3 --convert
-```
-
-##### Saving current Libraries
+Or drive every algorithm explicitly via `--algo {yolo,unet}`:
 
 ```sh
-pip freeze > requirements.txt 
+# Train / tune / convert / benchmark (YOLO)
+uv run python main.py train     --algo yolo --size 1400
+uv run python main.py train     --algo yolo --model 10        # resume/fine-tune
+uv run python main.py tune      --algo yolo
+uv run python main.py convert   --algo yolo --model 10
+uv run python main.py benchmark --algo yolo --workers 2
+
+# Inference (both algorithms, unified model selection)
+uv run python main.py test --algo yolo --model-dir ../models/yolo
+uv run python main.py test --algo unet --model-dir ../models/unet --threshold 0.5
+
+# Production proxy (segmented | annotated)
+uv run python main.py serve --algo yolo --model-dir ../models/yolo --port 5000
 ```
+
+### 💹 Production proxy
+
+`GET /image?url=<image-url>&mode=<segmented|annotated>` — designed for the
+[Bandwidth Hero](https://bandwidth-hero.com/) extension, as before.
 
 ## ⚠️ Error Solutions
 
