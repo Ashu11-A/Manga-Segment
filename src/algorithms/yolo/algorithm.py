@@ -123,6 +123,7 @@ class YoloAlgorithm(BaseAlgorithm):
       epochs=1000,
       batch=8,
       imgsz=size,
+      half=True,                # Usa meia precisão (FP16) via AMP para reduzir VRAM e acelerar o treinamento.
       cache=True,               # Carrega as imagens diretamente na RAM do sistema, eliminando gargalos de leitura de disco.
       optimizer="MuSGD",        # Define o algoritmo (Momentum SGD) usado para minimizar a perda e ajustar os pesos.
       rect=False,               # Desativa o preenchimento de imagens retangulares, liberando o processamento em grade quadrada do Mosaic.
@@ -175,6 +176,7 @@ class YoloAlgorithm(BaseAlgorithm):
       epochs=epochs,
       batch=1,
       imgsz=size,
+      half=True,
       optimizer="MuSGD",
       lr0=0.0001,
       cache=True,
