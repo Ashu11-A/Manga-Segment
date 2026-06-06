@@ -14,6 +14,7 @@ from core.registry import register
 from core.segmenter import BaseSegmenter
 
 from algorithms.yolo import weights as weights_mod
+from algorithms.yolo.models import DEFAULT_MODEL
 from algorithms.yolo.segmenter import YoloSegmenter
 
 
@@ -30,7 +31,7 @@ class YoloAlgorithm(BaseAlgorithm):
     size: int | list[int] | None = None,
     model_id: int | None = None,
     model_dir: str | None = None,
-    model_name: str = "yolo26s-seg.pt",
+    model_name: str = DEFAULT_MODEL,
     data_path: str | None = None,
     config_path: str | None = None,
   ) -> None:
@@ -120,17 +121,17 @@ class YoloAlgorithm(BaseAlgorithm):
       cfg=self.config_path,
       patience=100,
       epochs=1000,
-      batch=1,
+      batch=8,
       imgsz=size,
       cache=True,               # Carrega as imagens diretamente na RAM do sistema, eliminando gargalos de leitura de disco.
       optimizer="MuSGD",        # Define o algoritmo (Momentum SGD) usado para minimizar a perda e ajustar os pesos.
       rect=False,               # Desativa o preenchimento de imagens retangulares, liberando o processamento em grade quadrada do Mosaic.
-      copy_paste=0.3,           # Probabilidade (30%) de recortar as máscaras das classes e colá-las em novos fundos de outras imagens.
-      mixup=0.2,                # Probabilidade (20%) de sobrepor duas imagens transparentes, forçando aprendizado de padrões mistos.
-      mosaic=1.0,               # Ativação total (100%) da técnica que junta 4 imagens em uma única, aumentando o contexto de pequenos objetos.
-      multi_scale=0.25,         # Oscila a resolução de entrada dinamicamente em até +/- 25% para tornar a rede robusta a distâncias diferentes.
-      mask_ratio=2,             # Define a compressão da máscara de segmentação resultante (ex: 2 comprime para um quarto do tamanho).
-      dropout=0.1,              # Desliga 10% das conexões neurais aleatoriamente a cada época para impedir a rede de apenas memorizar os dados.
+      # copy_paste=0.3,           # Probabilidade (30%) de recortar as máscaras das classes e colá-las em novos fundos de outras imagens.
+      # mixup=0.2,                # Probabilidade (20%) de sobrepor duas imagens transparentes, forçando aprendizado de padrões mistos.
+      # mosaic=1.0,               # Ativação total (100%) da técnica que junta 4 imagens em uma única, aumentando o contexto de pequenos objetos.
+      # multi_scale=0.25,         # Oscila a resolução de entrada dinamicamente em até +/- 25% para tornar a rede robusta a distâncias diferentes.
+      # mask_ratio=2,             # Define a compressão da máscara de segmentação resultante (ex: 2 comprime para um quarto do tamanho).
+      # dropout=0.1,              # Desliga 10% das conexões neurais aleatoriamente a cada época para impedir a rede de apenas memorizar os dados.
       val=True,                 # Habilita o cálculo do mAP nas imagens de validação para mensurar o desempenho real.
       plots=True,               # Instrui a biblioteca a renderizar as imagens de curva de perda, matrizes de confusão e detecções visuais.
       save=True,                # Permite que o modelo salve fisicamente os arquivos .pt do treinamento.
