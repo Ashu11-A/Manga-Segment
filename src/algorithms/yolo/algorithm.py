@@ -81,6 +81,8 @@ class YoloAlgorithm(BaseAlgorithm):
     augment: bool = False,
     **kwargs: Any,
   ) -> YoloSegmenter:
+    if "conf" in kwargs:
+      confidence = kwargs["conf"]
     # Inference does not depend on the dataset, so fall back to the YOLO default
     # rather than auto-detecting when --size was left unset.
     imgsz = self.size if self.size is not None else 1280

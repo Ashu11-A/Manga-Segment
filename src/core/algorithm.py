@@ -66,16 +66,21 @@ class BaseAlgorithm(ABC):
 		model_id: int | None = None,
 		model_dir: str | None = None,
 		keep_classes: list[str] | None = None,
+		ignore_classes: list[str] | None = None,
 		save_masks: bool = True,
 		save_segmented: bool = True,
+		draw_overlay: bool = False,
 		**segmenter_kwargs: Any,
 	) -> list[str]:
 		"""Resolve the model, build a segmenter and run directory inference.
 
 		Implemented once here so no backend re-implements the wiring. ``model_id``
 		/ ``model_dir`` fall back to the values supplied at construction time.
-		``save_masks`` / ``save_segmented`` let a backend tune which artifacts are
-		written (e.g. U-Net suppresses per-instance grayscale masks).
+		``keep_classes`` / ``ignore_classes`` allow- and deny-list which classes
+		reach the composite; ``save_masks`` / ``save_segmented`` let a backend tune
+		which artifacts are written (e.g. U-Net suppresses per-instance masks);
+		``draw_overlay`` additionally writes a website-style coloured/labelled
+		prediction image per input.
 		"""
 		ref = self.resolve_model_ref(
 			model_id=model_id if model_id is not None else self.model_id,
@@ -86,8 +91,10 @@ class BaseAlgorithm(ABC):
 			images_dir,
 			output_dir,
 			keep_classes=keep_classes,
+			ignore_classes=ignore_classes,
 			save_masks=save_masks,
 			save_segmented=save_segmented,
+			draw_overlay=draw_overlay,
 		)
 
 	# -- optional capabilities (default: not supported) ----------------------

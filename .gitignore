@@ -36,3 +36,5 @@ runs/
 output/
 coco-seg/
 /models
+
+*.png
