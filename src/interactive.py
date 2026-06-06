@@ -88,6 +88,34 @@ def _discover_algos() -> list[str]:
 		return ["yolo", "unet"]
 
 
+def _prompt_base_model(q, current_default: str) -> str | object:
+	"""Two-step interactive picker: YOLO family → model size.
+
+	Returns the chosen model filename or ``_CANCELLED``.
+	"""
+	from algorithms.yolo.models import DEFAULT_MODEL, FAMILIES, family_of
+
+	default_family = family_of(current_default) or list(FAMILIES)[0]
+
+	family = q.select(
+		"YOLO family:",
+		choices=list(FAMILIES.keys()),
+		default=default_family,
+	).ask()
+	if family is None:
+		return _CANCELLED
+
+	models = FAMILIES[family]
+	default_model = current_default if current_default in models else models[1]
+
+	model = q.select(
+		"Model size:",
+		choices=models,
+		default=default_model,
+	).ask()
+	return _CANCELLED if model is None else model
+
+
 # ── per-option prompting ──────────────────────────────────────────────────────
 
 _CANCELLED = object()
@@ -121,6 +149,11 @@ def _prompt_option(q, action: argparse.Action, algos: list[str]):
 	if _is_boolean(action):
 		answer = q.confirm(label + " ?", default=bool(action.default)).ask()
 		return _CANCELLED if answer is None else ("bool", answer)
+
+	# YOLO base-model picker: two-step family → size selection.
+	if action.dest == "base_model":
+		result = _prompt_base_model(q, str(action.default or ""))
+		return result if result is _CANCELLED else ("value", result)
 
 	# The algorithm picker gets the discovered plug-in list.
 	if action.dest == "algo":

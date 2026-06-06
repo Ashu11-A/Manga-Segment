@@ -22,6 +22,8 @@ from __future__ import annotations
 import argparse
 import sys
 
+from algorithms.yolo.models import ALL_MODELS as _YOLO_MODELS, DEFAULT_MODEL as _YOLO_DEFAULT
+
 
 def build_parser() -> argparse.ArgumentParser:
 	parser = argparse.ArgumentParser(
@@ -56,6 +58,16 @@ def build_parser() -> argparse.ArgumentParser:
 	sp.add_argument(
 		"--patience", type=int, default=None, help="Early-stopping patience."
 	)
+	sp.add_argument(
+		"--base-model",
+		default=_YOLO_DEFAULT,
+		choices=_YOLO_MODELS,
+		metavar="MODEL",
+		help=(
+			f"Base YOLO model to train from scratch (default: {_YOLO_DEFAULT}). "
+			"Interactive wizard picks family + size when omitted in the wizard."
+		),
+	)
 
 	# test (inference)
 	sp = sub.add_parser("test", help="Run segmentation inference over a folder.")
@@ -81,6 +93,13 @@ def build_parser() -> argparse.ArgumentParser:
 	# tune
 	sp = sub.add_parser("tune", help="Hyperparameter tuning.")
 	add_algo(sp)
+	sp.add_argument(
+		"--base-model",
+		default=_YOLO_DEFAULT,
+		choices=_YOLO_MODELS,
+		metavar="MODEL",
+		help=f"Base YOLO model to tune (default: {_YOLO_DEFAULT}).",
+	)
 
 	# convert
 	sp = sub.add_parser("convert", help="Export a trained model (ONNX/TFJS).")
@@ -211,11 +230,16 @@ def main(argv: list[str] | None = None) -> int:
 		)
 		return 2
 
+	extra: dict = {}
+	if bm := getattr(args, "base_model", None):
+		extra["model_name"] = bm
+
 	algo = get_algorithm(
 		args.algo,
 		size=args.size,
 		model_id=getattr(args, "model", None),
 		model_dir=getattr(args, "model_dir", None),
+		**extra,
 	)
 
 	try:
