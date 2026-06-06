@@ -1,9 +1,16 @@
+# Secrets
+.env
+
+# Previews
+previews/
+
 # Dataset
-dataset
+/dataset
 logs
 
 # Python
 *.pyc
+__pycache__/
 
 # Python - Windowns
 build/config.gypi
