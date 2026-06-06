@@ -104,10 +104,44 @@ class YoloAlgorithm(BaseAlgorithm):
     self.model_id = int(match_id.group()) if match_id else 1
     print(f'✅ model_id atualizado para: {self.model_id}')
 
-  def train(self, **kwargs: Any) -> None:
+  def train(
+    self,
+    *,
+    resume: bool = False,
+    epochs: int | None = None,
+    batch: int | None = None,
+    patience: int | None = None,
+    model_id: int | None = None,
+    **kwargs: Any,
+  ) -> None:
     from ultralytics import YOLO
 
     device = resolve_device()
+
+    if model_id is not None:
+      self.model_id = model_id
+
+    # Retomar um treino interrompido a partir do seu last.pt: o Ultralytics
+    # restaura o estado do otimizador/EMA e o contador de épocas e continua até
+    # o alvo de épocas original. Ele permite sobrescrever alguns argumentos no
+    # resume — em especial `batch` — justamente para recuperar de um erro de
+    # falta de VRAM (OOM) usando um batch menor.
+    if resume:
+      ckpt = weights_mod.resolve_weights(model_id=self.model_id, weight="last.pt")
+      print(f"⏯️  Retomando treinamento a partir de: {ckpt}")
+      model = YOLO(ckpt, task="segment").to(device)
+      overrides: dict[str, Any] = {"resume": ckpt, "device": device}
+      if batch is not None:
+        overrides["batch"] = batch
+      if patience is not None:
+        overrides["patience"] = patience
+      model.train(**overrides)
+      self._update_model_id(model)
+      trainer_args = getattr(getattr(model, "trainer", None), "args", None)
+      imgsz = getattr(trainer_args, "imgsz", None) or self._resolve_size()
+      model.export(format="onnx", imgsz=imgsz, half=True)
+      return
+
     size = self._resolve_size()
 
     if self.model_id is not None:
@@ -119,9 +153,9 @@ class YoloAlgorithm(BaseAlgorithm):
     model.train(
       data=self._require_data_path(),
       cfg=self.config_path,
-      patience=100,
-      epochs=1000,
-      batch=8,
+      patience=patience if patience is not None else 100,
+      epochs=epochs if epochs is not None else 1000,
+      batch=batch if batch is not None else 8,
       imgsz=size,
       half=True,                # Usa meia precisão (FP16) via AMP para reduzir VRAM e acelerar o treinamento.
       cache=True,               # Carrega as imagens diretamente na RAM do sistema, eliminando gargalos de leitura de disco.
