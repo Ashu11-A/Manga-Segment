@@ -50,13 +50,25 @@ def build_parser() -> argparse.ArgumentParser:
 		)
 
 	# train
-	sp = sub.add_parser("train", help="Train a model from scratch (or resume --model).")
+	sp = sub.add_parser(
+		"train",
+		help="Train from scratch, fine-tune (--model), or resume (--resume).",
+	)
 	add_algo(sp)
 	sp.add_argument("--model", type=int, default=None, help="Resume/base model id.")
 	sp.add_argument("--epochs", type=int, default=None, help="Number of epochs.")
 	sp.add_argument("--batch", type=int, default=None, help="Batch size.")
 	sp.add_argument(
 		"--patience", type=int, default=None, help="Early-stopping patience."
+	)
+	sp.add_argument(
+		"--resume",
+		action="store_true",
+		help=(
+			"Resume an interrupted run from its last.pt, continuing toward the "
+			"original epoch target. Use --model <id> to pick which run to resume "
+			"(default: the latest); pass --batch to lower VRAM use after an OOM."
+		),
 	)
 	sp.add_argument(
 		"--base-model",
@@ -251,6 +263,8 @@ def main(argv: list[str] | None = None) -> int:
 			}
 			if args.model is not None:
 				kwargs["model_id"] = args.model
+			if args.resume:
+				kwargs["resume"] = True
 			algo.train(**kwargs)
 
 		elif args.command == "test":
