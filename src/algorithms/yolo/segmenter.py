@@ -38,8 +38,11 @@ class YoloSegmenter(BaseSegmenter):
 		verbose: bool = False,
 	) -> None:
 		self.device = resolve_device(device)
-		# Half precision is only valid on CUDA; enabling it on CPU raises.
-		self.half = supports_half(self.device)
+		# Half precision is only valid on CUDA; enabling it on CPU raises. It is
+		# also incompatible with retina_masks: Ultralytics' process_mask_native
+		# multiplies half mask coefficients by float protos, raising a dtype
+		# mismatch, so FP16 inference is only kept when retina_masks is off.
+		self.half = supports_half(self.device) and not retina_masks
 		self.imgsz = imgsz
 		self.conf = conf
 		self.iou = iou
@@ -100,8 +103,10 @@ class YoloSegmenter(BaseSegmenter):
 		output_dir: str,
 		*,
 		keep_classes: list[str] | None = None,
+		ignore_classes: list[str] | None = None,
 		save_masks: bool = True,
 		save_segmented: bool = True,
+		draw_overlay: bool = False,
 	) -> list[str]:
 		"""Segment every image in ``images_dir`` and write outputs to ``output_dir``.
 
@@ -126,8 +131,10 @@ class YoloSegmenter(BaseSegmenter):
 					seg_result,
 					output_dir,
 					keep_classes=keep_classes,
+					ignore_classes=ignore_classes,
 					save_masks=save_masks,
 					save_segmented=save_segmented,
+					draw_overlay=draw_overlay,
 				)
 			)
 

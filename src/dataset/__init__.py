@@ -13,6 +13,7 @@ construir a linha de comando.
 
 from __future__ import annotations
 
+from .class_videos import add_class_videos_arguments, run_class_videos
 from .distill import (
 	DistillationConfig,
 	add_distill_arguments,
@@ -28,4 +29,6 @@ __all__ = [
 	"run_distill",
 	"add_download_arguments",
 	"run_download",
+	"add_class_videos_arguments",
+	"run_class_videos",
 ]

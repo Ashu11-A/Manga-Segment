@@ -99,7 +99,32 @@ def build_parser() -> argparse.ArgumentParser:
 		"--keep-classes",
 		nargs="*",
 		default=None,
-		help="Classes to keep in the composite.",
+		help="Classes to keep in the composite (allow-list; default: all).",
+	)
+	sp.add_argument(
+		"--ignore-classes",
+		nargs="*",
+		default=None,
+		help="Classes to drop from the composite (deny-list, e.g. text).",
+	)
+	sp.add_argument(
+		"--only-segmented",
+		action=argparse.BooleanOptionalAction,
+		default=True,
+		help=(
+			"Export only the composited <stem>_segmented.png per image, skipping "
+			"the per-instance <stem>_<class>_<i>_mask.png files (default: on; pass "
+			"--no-only-segmented to also write per-instance masks)."
+		),
+	)
+	sp.add_argument(
+		"--draw",
+		action="store_true",
+		help=(
+			"Desenha a predição estilo site de demo (máscaras coloridas por classe "
+			"+ nome da classe em cima) em <stem>_overlay.png. Respeita "
+			"--keep-classes/--ignore-classes e não gera máscaras nem composite."
+		),
 	)
 
 	# tune
@@ -167,6 +192,16 @@ def build_parser() -> argparse.ArgumentParser:
 
 	add_distill_arguments(sp)
 
+	# class-videos (recorta instâncias por classe e monta um vídeo por classe)
+	sp = sub.add_parser(
+		"class-videos",
+		help="Extrai instâncias recortadas/centralizadas por classe e gera um vídeo por classe (ffmpeg).",
+	)
+	# Importado de forma tardia: opencv/numpy só são puxados ao executar o comando.
+	from dataset.class_videos import add_class_videos_arguments
+
+	add_class_videos_arguments(sp)
+
 	return parser
 
 
@@ -211,6 +246,13 @@ def main(argv: list[str] | None = None) -> int:
 				file=sys.stderr,
 			)
 			return 1
+
+	# class-videos is a dataset-visualization command: it only needs cv2/numpy +
+	# ffmpeg, so dispatch it before loading the algorithm registry (no torch).
+	if args.command == "class-videos":
+		from dataset.class_videos import run_class_videos
+
+		return run_class_videos(args)
 
 	# Heavy imports happen only after argument parsing (so --help stays fast).
 	import algorithms
@@ -268,14 +310,19 @@ def main(argv: list[str] | None = None) -> int:
 			algo.train(**kwargs)
 
 		elif args.command == "test":
+			# --draw produces only the website-style overlay (no masks/composite).
 			written = algo.test(
 				images_dir=args.images or paths.images_dir(),
 				output_dir=args.output or paths.output_dir(),
 				model_id=args.model,
 				model_dir=args.model_dir,
 				keep_classes=args.keep_classes,
+				ignore_classes=args.ignore_classes,
+				save_masks=not args.only_segmented and not args.draw,
+				save_segmented=not args.draw,
+				draw_overlay=args.draw,
 				threshold=args.threshold,
-				conf=args.conf,
+				confidence=args.conf,
 			)
 			print(f"✅ {len(written)} file(s) written.")
 
