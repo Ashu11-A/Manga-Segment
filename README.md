@@ -14,21 +14,15 @@
 
 ## 📃 | Description
 
-This is a simple project developed in [Python](https://www.python.org), aimed at removing manga backgrounds. I created this because I usually read manga at night.
+Manga Segment is a [Python](https://www.python.org) computer-vision project for comic and manga page analysis. It trains and runs segmentation models to identify areas of interest such as panels, speech balloons, thought balloons, caption boxes, and text regions, then exports masks, overlays, segmented images, reports, and serving utilities for downstream processing.
 
-To use this project in production, you need to install the [Bandwidth Hero](https://bandwidth-hero.com/) browser extension. If you prefer reading manga in a specific reader, I recommend [TachiyomiAZ](https://github.com/jobobby04/TachiyomiSY), which is compatible with [Bandwidth Hero](https://bandwidth-hero.com/).
+The objective is automatic comic translation: segment the areas of interest where text is located, process and generalize those regions to remove the old text, and add the translation on top of the redrawn image.
 
-This project was structured and tested with [U-Net](https://en.wikipedia.org/wiki/U-Net) and [Yolo](https://docs.ultralytics.com)(v8, v11).
+This project was structured and tested with [U-Net](https://en.wikipedia.org/wiki/U-Net) and [Yolo](https://docs.ultralytics.com)(v8, v11, v26).
 
-| Input | YoloV8n (v0.1) | YoloV8s (v0.2) | YoloV11s (v0.2) |
-|--|--|--|--|
-| ![Input](./.github/img/input.png) | ![YolovV8n-output](./.github/img/yolov8n-0.1-output.png) | ![YolovV8s-output](./.github/img/yolov8s-0.2-output.png) | ![YoloV11s-output](./.github/img/yolov11s-0.2-output.png) |
-
-## Diff
-
-| Input | YoloV8n(v0.1) / YoloV8s(v0.2) | Yolov8n(v0.1) / Yolov11s(v0.2) | Yolov8s(v0.2) / Yolov11s(v0.2)
-|--|--|--|--|
-| ![Input](./.github/img/input.png) | ![YoloV8n-YoloV8s-Diff](./.github/img/yolov8n-0.1-yolov8s-0.2-diff.png) | ![Yolov11-Yolov8-Diff](./.github/img/yolov11s-0.2-yolov8n-0.1-diff.png) | ![Yolov8s-Yolov11s-Diff](./.github/img/yolov8s-0.2-yolov11s-0.2-diff.png)
+| Input | U-Net | YoloV8n (v0.1) | YoloV8s (v0.2) | YoloV11s (v0.2) | YoloV26s (v0.3) |
+|--|--|--|--|--|--|
+| ![Input](./.github/img/input.png) | ![U-Net-output](./.github/img/unet-output.png) | ![YolovV8n-output](./.github/img/yolov8n-0.1-output.png) | ![YolovV8s-output](./.github/img/yolov8s-0.2-output.png) | ![YoloV11s-output](./.github/img/yolov11s-0.2-output.png) | ![YoloV26s-output](./.github/img/yolov26s-0.3-output.png) |
 
 ## Tune
 | Model | Tuning Time | Image Size | Epochs/Inter | Iterations | Fitness | Scatter Plots |
@@ -37,24 +31,36 @@ This project was structured and tested with [U-Net](https://en.wikipedia.org/wik
 
 ## Dataset versions
 
-| Property                  | v0.1                        | v0.2                                   |
-|---------------------------|-----------------------------|----------------------------------------|
-| Images                    | 283                         | ⬆️ 480                                 |
-| Train                     | 249                         | ⬆️ 420                                 |
-| Valid                     | 22                          | ⬆️ 40                                  |
-| Test                      | 12                          | ⬆️ 20                                  |
-| Annotations               | 3293                        | ⬆️ 4832                                |
-| Annotation comic          | 1258                        | ⬆️ 1938                                |
-| Annotation speech-balloon | 2035                        | ⬆️ 2894                                |
-| Auto-Orient               | Applied                     | Applied                                |
-| Resize                    | Stretch to 963x1400         | ⬜ Fit (white edges) in 963x1400       |
-| Auto-Adjust Contrast      | Using Contrast Stretching   | Using Contrast Stretching              |
-| Flip                      | Horizontal, Vertical        | Horizontal, Vertical                   |
-| Rotation                  | ❌                          | Between -15° and +15°                  |
-| Grayscale                 | Applied                     | Applied                                |
-| Exposure                  | ❌                          | Between -10% and +10%                  |
-| Blur                      | 0.5px                       | ⬆️ 1px                                 |
-| Noise                     | 0.5%                        | 0.5%                                   |
+### Images and annotations
+
+| Property                     | v0.1                  | v0.2             | v0.3                                 |
+|------------------------------|-----------------------|------------------|--------------------------------------|
+| Images                       | 283                   | 480              | 754                                  |
+| Train                        | 249                   | 420              | 660                                  |
+| Valid                        | 22                    | 40               | 94                                   |
+| Test                         | 12                    | 20               | 0                                    |
+| Annotations                  | 3293                  | 4832             | 60419                                |
+| Comic annotations            | 1258                  | 1938             | 3522                                 |
+| Speech-balloon annotations   | 2035                  | 2894             | 4194                                 |
+| Caption-box annotations      | ❌                    | ❌               | 283                                  |
+| Thought-balloon annotations  | ❌                    | ❌               | 749                                  |
+| Text annotations             | ❌                    | ❌               | 51671                                |
+
+### Preprocessing and augmentations
+
+| Property                     | v0.1                      | v0.2                                  | v0.3                                   |
+|------------------------------|---------------------------|---------------------------------------|----------------------------------------|
+| Auto-Orient                  | ✅                        | ✅                                    | ✅                                     |
+| Grayscale                    | ✅                        | ✅                                    | ✅                                     |
+| Resize                       | Stretch to 963x1400       | ⬜ Fit (white edges) in 963x1400      | Fit (white edges) in 992x1440          |
+| Auto-Adjust Contrast         | Using Contrast Stretching | Using Contrast Stretching             | Using Contrast Stretching              |
+| Crop                         | ❌                        | ❌                                    | 0% Minimum Zoom, 20% Maximum Zoom      |
+| Shear                        | ❌                        | ❌                                    | ±10° Horizontal, ±10° Vertical         |
+| Rotation                     | ❌                        | Between -15° and +15°                 | Between -15° and +15°                  |
+| Exposure                     | ❌                        | Between -10% and +10%                 | ❌                                     |
+| Flip                         | Horizontal, Vertical      | Horizontal, Vertical                  | ❌                                     |
+| Blur                         | 0.5px                     | ⬆️ 1px                                | ❌                                     |
+| Noise                        | 0.5%                      | 0.5%                                  | ❌                                     |
 
 
 ## Comparison (Unet vs YoloV8 vs YoloV11)
@@ -70,7 +76,7 @@ This project was structured and tested with [U-Net](https://en.wikipedia.org/wik
 | Stop Epoch       | 26                  | 411                      | 169                      | 251                      |
 | Image Set        | 3.882               | 283                      | 480                      | 480                      |
 | Image Channels   | 4                   | 3                        | 3                        | 3                        |
-| Training Size    | 512x768             | 1280x1280                | 1400x1400                | 1400x1400                |
+| Training Size    | 512x768             | 1280²                    | 1400²                    | 1400²                    |
 | Dropout          | 0.2                 | ❌                       | ❌                       | ❌                       |
 | Kernel Size      | 3                   | 3                        | 3                        | 3                        |
 | Filter           | [32,64,128,256,512] | [64,128,256,512,768]     | [64,128,256,512,768]     | [64,128,256,512,1024]    |
@@ -79,22 +85,20 @@ This project was structured and tested with [U-Net](https://en.wikipedia.org/wik
 [Details about Yolov8](https://github.com/ultralytics/ultralytics/issues/189)
 [Details about Yolov11](https://www.youtube.com/watch?v=L9Va7Y9UT8E)
 
-## 📝 | Cite [This Project](https://universe.roboflow.com/ashu-biqfs/manga-segment)
+## 📝 | Cite [This Project](https://universe.roboflow.com/ashu-biqfs/manga-segment_v2)
 If you use this dataset in a research paper, please cite it using the following BibTeX:
 
 ```
-@misc{
-  manga-segment_dataset,
-  title = { manga-segment Dataset },
+@misc{ manga-segment_v2_dataset,
+  title = { manga-segment_v2 Dataset },
   type = { Open Source Dataset },
   author = { Ashu },
-  howpublished = { \url{ https://universe.roboflow.com/ashu-biqfs/manga-segment } },
-  url = { https://universe.roboflow.com/ashu-biqfs/manga-segment },
+  howpublished = { \url{ https://universe.roboflow.com/ashu-biqfs/manga-segment_v2 } },
+  url = { https://universe.roboflow.com/ashu-biqfs/manga-segment_v2 },
   journal = { Roboflow Universe },
   publisher = { Roboflow },
-  year = { 2025 },
-  month = { jan },
-  note = { visited on 2025-01-24 },
+  year = { 2026 },
+  month = { jun },
 }
 ```
 
@@ -102,9 +106,10 @@ If you use this dataset in a research paper, please cite it using the following 
 
 | Program | Version   |
 | ------- | --------  |
-| [Python](https://www.python.org)  | [v3.10.12](https://www.python.org/downloads/release/python-31012/) |
+| [Python](https://www.python.org)  | >= 3.12 |
+| [uv](https://docs.astral.sh/uv/) | latest |
 
-## 📦 | [Unified package](https://github.com/Ashu11-A/Manga-Segment/tree/main/src)
+## 📦 | Setup
 
 Training, inference and the production proxy now live in a single
 [uv](https://docs.astral.sh/uv/)-managed folder (`src/`) built on a scalable,
@@ -117,98 +122,17 @@ sudo apt install nvidia-cuda-toolkit
 sudo apt install -y libjpeg-dev zlib1g-dev
 
 cd src
-uv sync                       # inference + serving + training
-uv sync --extra unet-training # add tensorflowjs + keras-tuner (U-Net train/convert)
+uv sync
 ```
 
-### Unified CLI
+### CLI documentation
 
-Run `main.py` with **no arguments** for an interactive arrow-key wizard that
-lets you pick a command and its options, prints the resulting command, and then
-runs it (training starts right away for `train`):
-
-```sh
-uv run python main.py        # interactive: ↑/↓ select → toggle options → run
-```
-
-Or drive every algorithm explicitly via `--algo {yolo,unet}`:
-
-```sh
-# Train / tune / convert / benchmark (YOLO)
-uv run python main.py train     --algo yolo --size 1400
-uv run python main.py train     --algo yolo --model 10        # resume/fine-tune
-uv run python main.py tune      --algo yolo
-uv run python main.py convert   --algo yolo --model 10
-uv run python main.py benchmark --algo yolo --workers 2
-
-# Inference (both algorithms, unified model selection)
-uv run python main.py test --algo yolo --model-dir ../models/yolo
-uv run python main.py test --algo unet --model-dir ../models/unet --threshold 0.5
-
-# Production proxy (segmented | annotated)
-uv run python main.py serve --algo yolo --model-dir ../models/yolo --port 5000
-```
+[`docs/CLI.md`](./docs/CLI.md)
 
 ### 💹 Production proxy
 
-`GET /image?url=<image-url>&mode=<segmented|annotated>` — designed for the
-[Bandwidth Hero](https://bandwidth-hero.com/) extension, as before.
+`GET /image?url=<image-url>&mode=<segmented|annotated>` — serves segmented or annotated image responses for integration with external tools.
 
-## ⚠️ Error Solutions
-
-#### Error code: ImportError: cannot import name 'shape_poly' from 'jax.experimental.jax2tf'
-
-##### Cause: This error comes from the code itself.
-
-##### Solution:
-[https://github.com/google/jax/issues/18978#issuecomment-1866980463](https://github.com/google/jax/issues/18978#issuecomment-1866980463)
-
-```py
-# Path: lib/python3.10/site-packages/tensorflowjs/converters/jax_conversion.py
-
-# Remove:
-from jax.experimental.jax2tf import shape_poly
-PolyShape = shape_poly.PolyShape
-
-# Add:
-from jax.experimental.jax2tf import PolyShape
-```
-
-#### Error code: Wsl/Service/CreateInstance/MountVhd/HCS/ERROR_FILE_NOT_FOUND
-
-##### Cause: You possibly uninstalled and reinstalled WSL/distribution.
-
-##### Solution:
-
-```sh
-# List the distributions installed by running the following in PowerShell.
-wsl -l
-
-# Unregister the distribution. Replace "Ubuntu" below with your distribution name found in Step #1:
-wsl --unregister Ubuntu-22.04
-
-# Launch the Ubuntu (or other distribution) installed via the Microsoft Store
-```
-
-#### Yolo arg --best
-##### Error:
-```
-QObject::moveToThread: Current thread (0x5a75e26f1250) is not the object's thread (0x5a75e21c6fa0).
-Cannot move to target thread (0x5a75e26f1250)
-
-qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "/home/ashu/Documents/GitHub/Manga-Segment/lib/python3.10/site-packages/cv2/qt/plugins" even though it was found.
-This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
-
-Available platform plugins are: xcb, eglfs, linuxfb, minimal, minimalegl, offscreen, vnc, wayland-egl, wayland, wayland-xcomposite-egl, wayland-xcomposite-glx, webgl.
-
-```
-
-### Solution:
-[https://github.com/NVlabs/instant-ngp/discussions/300#discussioncomment-3179213](https://github.com/NVlabs/instant-ngp/discussions/300#discussioncomment-3179213)
-```sh
-pip uninstall opencv-python
-pip install opencv-python-headless
-```
 
 ## [YoloV8](https://docs.ultralytics.com/models/yolov8):
 ```
@@ -223,7 +147,7 @@ pip install opencv-python-headless
 }
 ```
 
-## [YoloV11](https://docs.ultralytics.com/models/yolo11):
+## [Yolo11](https://docs.ultralytics.com/models/yolo11):
 ```
 @software{yolo11_ultralytics,
   author = {Glenn Jocher and Jing Qiu},
@@ -236,7 +160,21 @@ pip install opencv-python-headless
 }
 ```
 
-## [U-Net article](https://arxiv.org/abs/1505.04597):
+## [Yolo26](https://docs.ultralytics.com/models/yolo26)
+```
+@misc{jocher2026ultralyticsyolo26unifiedrealtime,
+  title = {Ultralytics YOLO26: Unified Real-Time End-to-End Vision Models},
+  author = {Glenn Jocher and Jing Qiu and Mengyu Liu and Shuai Lyu and Fatih Cagatay Akyon and Muhammet Esat Kalfaoglu},
+  year = {2026},
+  eprint = {2606.03748},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CV},
+  doi = {10.48550/arXiv.2606.03748},
+  url = {https://arxiv.org/abs/2606.03748},
+}
+```
+
+## [U-Net](https://arxiv.org/abs/1505.04597):
 ```
 Ronneberger, Olaf, Philipp Fischer, and Thomas Brox.
 "U-net: Convolutional networks for biomedical image segmentation."
