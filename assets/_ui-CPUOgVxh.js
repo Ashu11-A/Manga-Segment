@@ -1,0 +1,1 @@
+const e="Current language",a={"modal.title":"Presentation language","modal.subtitle":"Choose the slides' language. You can change it later via the globe icon.","button.label":"Change language",current:e};export{e as current,a as default};

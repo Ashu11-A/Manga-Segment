@@ -1,0 +1,1 @@
+const a="Idioma actual",e={"modal.title":"Idioma de la presentación","modal.subtitle":"Elige el idioma de las diapositivas. Puedes cambiarlo luego con el icono del globo.","button.label":"Cambiar idioma",current:a};export{a as current,e as default};

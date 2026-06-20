@@ -1,0 +1,97 @@
+{
+  "generatedAt": "2026-06-20T04:41:50.024Z",
+  "deck": "manga-segment",
+  "label": "Manga-Segment",
+  "slideCount": 12,
+  "thumbnail": {
+    "width": 640,
+    "height": 360
+  },
+  "onnx": true,
+  "slides": [
+    {
+      "index": 0,
+      "page": 1,
+      "id": "manga-segment-1",
+      "title": "Manga-Segment · Slide 01",
+      "thumbnail": "/precomputed/manga-segment/thumbnail/01.png"
+    },
+    {
+      "index": 1,
+      "page": 2,
+      "id": "manga-segment-2",
+      "title": "Manga-Segment · Slide 02",
+      "thumbnail": "/precomputed/manga-segment/thumbnail/02.png"
+    },
+    {
+      "index": 2,
+      "page": 3,
+      "id": "manga-segment-3",
+      "title": "Manga-Segment · Slide 03",
+      "thumbnail": "/precomputed/manga-segment/thumbnail/03.png"
+    },
+    {
+      "index": 3,
+      "page": 4,
+      "id": "manga-segment-4",
+      "title": "Manga-Segment · Slide 04",
+      "thumbnail": "/precomputed/manga-segment/thumbnail/04.png"
+    },
+    {
+      "index": 4,
+      "page": 5,
+      "id": "manga-segment-5",
+      "title": "Manga-Segment · Slide 05",
+      "thumbnail": "/precomputed/manga-segment/thumbnail/05.png"
+    },
+    {
+      "index": 5,
+      "page": 6,
+      "id": "manga-segment-6",
+      "title": "Manga-Segment · Slide 06",
+      "thumbnail": "/precomputed/manga-segment/thumbnail/06.png"
+    },
+    {
+      "index": 6,
+      "page": 7,
+      "id": "manga-segment-7",
+      "title": "Manga-Segment · Slide 07",
+      "thumbnail": "/precomputed/manga-segment/thumbnail/07.png"
+    },
+    {
+      "index": 7,
+      "page": 8,
+      "id": "manga-segment-8",
+      "title": "Manga-Segment · Slide 08",
+      "thumbnail": "/precomputed/manga-segment/thumbnail/08.png"
+    },
+    {
+      "index": 8,
+      "page": 9,
+      "id": "manga-segment-9",
+      "title": "Manga-Segment · Slide 09",
+      "thumbnail": "/precomputed/manga-segment/thumbnail/09.png"
+    },
+    {
+      "index": 9,
+      "page": 10,
+      "id": "manga-segment-10",
+      "title": "Manga-Segment · Slide 10",
+      "thumbnail": "/precomputed/manga-segment/thumbnail/10.png"
+    },
+    {
+      "index": 10,
+      "page": 11,
+      "id": "manga-segment-11",
+      "title": "Manga-Segment · Slide 11",
+      "thumbnail": "/precomputed/manga-segment/thumbnail/11.png"
+    },
+    {
+      "index": 11,
+      "page": 12,
+      "id": "manga-segment-12",
+      "title": "Manga-Segment · Slide 12",
+      "thumbnail": "/precomputed/manga-segment/thumbnail/12.png"
+    }
+  ]
+}
