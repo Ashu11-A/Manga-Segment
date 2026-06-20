@@ -85,6 +85,12 @@ This project was structured and tested with [U-Net](https://en.wikipedia.org/wik
 [Details about Yolov8](https://github.com/ultralytics/ultralytics/issues/189)
 [Details about Yolov11](https://www.youtube.com/watch?v=L9Va7Y9UT8E)
 
+## ⚠️ | Disclaimer
+
+This project does not hold the copyright to any work used in connection with the training of its models. Any manga, comic, or other material attributed to the training process remains the property of its respective copyright holders, and no ownership over such works is claimed here. The author does not have the financial means to afford a lawsuit, and this material is shared in good faith.
+
+This project was developed as part of a practical academic study and was built over the course of two years. It is intended for research and educational purposes only. If you are a rights holder and have concerns about any content, please open an issue or contact the author at [Matheusn.biolowons@gmail.com](mailto:Matheusn.biolowons@gmail.com), and it will be addressed promptly.
+
 ## 📝 | Cite [This Project](https://universe.roboflow.com/ashu-biqfs/manga-segment_v2)
 If you use this dataset in a research paper, please cite it using the following BibTeX:
 
